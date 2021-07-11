@@ -1,7 +1,7 @@
 import config
 import handlers
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Updater, CallbackContext, Filters, MessageHandler
+from telegram.ext import Updater, CallbackContext, Filters, MessageHandler, CallbackQueryHandler
 
 
 catalogue_btn = "Каталог"
@@ -33,10 +33,18 @@ def get_my_masters_keyboard(update: Update, context: CallbackContext):
     update.message.reply_text(text="Мои мастера:", reply_markup=reply_markup)
 
 
+#  обработчик нажатия на кнопку инлайн клавы с именем мастера
+def choose_master_inline(update: Update, context: CallbackContext):
+    query = update.callback_query
+    query.answer()
+    query.edit_message_text(text=query.data)
+
+
 def main():
     updater = Updater(token=config.BOT_TOKEN, use_context=True)   # подключение к боту
     updater.dispatcher.add_handler(MessageHandler(filters=Filters.regex("/start"), callback=start_screen))  # добавление обработчика сообщений в очередь, в параметрах условие для выполнения и действие, которое выполнится
     updater.dispatcher.add_handler(MessageHandler(filters=Filters.regex(my_masters_btn), callback=get_my_masters_keyboard))
+    updater.dispatcher.add_handler(CallbackQueryHandler(callback=choose_master_inline))
 
     updater.start_polling()   # начало стучания по апи телеги
     updater.idle()            # бесконечный цикл простукивания
