@@ -1,4 +1,6 @@
-from telegram import Update, KeyboardButton, ReplyKeyboardMarkup
+import config
+import handlers
+from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CallbackContext, Filters, MessageHandler
 
 
@@ -25,9 +27,16 @@ def start_screen(update: Update, context: CallbackContext):
     update.message.reply_text(text="Привет, друг!", reply_markup=reply_markup)  # отправка на апи телеги сообщения и клавы
 
 
+def get_my_masters_keyboard(update: Update, context: CallbackContext):
+    inline_keyboard = handlers.get_my_masters_btns()
+    reply_markup = InlineKeyboardMarkup(inline_keyboard)
+    update.message.reply_text(text="Мои мастера:", reply_markup=reply_markup)
+
+
 def main():
-    updater = Updater(token='1673248618:AAEpAdZVNcFsL10GTYNCh1NikdCI6tsgPBk', use_context=True)   # подключение к боту
+    updater = Updater(token=config.BOT_TOKEN, use_context=True)   # подключение к боту
     updater.dispatcher.add_handler(MessageHandler(filters=Filters.regex("/start"), callback=start_screen))  # добавление обработчика сообщений в очередь, в параметрах условие для выполнения и действие, которое выполнится
+    updater.dispatcher.add_handler(MessageHandler(filters=Filters.regex(my_masters_btn), callback=get_my_masters_keyboard))
 
     updater.start_polling()   # начало стучания по апи телеги
     updater.idle()            # бесконечный цикл простукивания
