@@ -1,7 +1,14 @@
+import logging
 import config
-import handlers
-from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update, KeyboardButton, ReplyKeyboardMarkup
 from telegram.ext import Updater, CallbackContext, Filters, MessageHandler, CallbackQueryHandler
+import my_masters, my_orders, add_master, catalogue
+
+
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+)
+logger = logging.getLogger(__name__)
 
 
 catalogue_btn = "Каталог"
@@ -27,24 +34,11 @@ def start_screen(update: Update, context: CallbackContext):
     update.message.reply_text(text="Привет, друг!", reply_markup=reply_markup)  # отправка на апи телеги сообщения и клавы
 
 
-def get_my_masters_keyboard(update: Update, context: CallbackContext):
-    inline_keyboard = handlers.get_my_masters_btns()
-    reply_markup = InlineKeyboardMarkup(inline_keyboard)
-    update.message.reply_text(text="Мои мастера:", reply_markup=reply_markup)
-
-
-#  обработчик нажатия на кнопку инлайн клавы с именем мастера
-def choose_master_inline(update: Update, context: CallbackContext):
-    query = update.callback_query
-    query.answer()
-    query.edit_message_text(text=query.data)
-
-
 def main():
     updater = Updater(token=config.BOT_TOKEN, use_context=True)   # подключение к боту
     updater.dispatcher.add_handler(MessageHandler(filters=Filters.regex("/start"), callback=start_screen))  # добавление обработчика сообщений в очередь, в параметрах условие для выполнения и действие, которое выполнится
-    updater.dispatcher.add_handler(MessageHandler(filters=Filters.regex(my_masters_btn), callback=get_my_masters_keyboard))
-    updater.dispatcher.add_handler(CallbackQueryHandler(callback=choose_master_inline))
+    updater.dispatcher.add_handler(MessageHandler(filters=Filters.regex(my_masters_btn), callback=my_masters.get_my_masters_keyboard))
+    updater.dispatcher.add_handler(CallbackQueryHandler(callback=my_masters.choose_master_inline))
 
     updater.start_polling()   # начало стучания по апи телеги
     updater.idle()            # бесконечный цикл простукивания
