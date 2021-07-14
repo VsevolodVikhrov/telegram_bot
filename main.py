@@ -42,7 +42,11 @@ def main() -> None:
     updater.dispatcher.add_handler(add_master.conv_handler)
     updater.dispatcher.add_handler(MessageHandler(filters=Filters.regex("/start"), callback=start_screen))  # добавление обработчика сообщений в очередь, в параметрах условие для выполнения и действие, которое выполнится
     updater.dispatcher.add_handler(MessageHandler(filters=Filters.regex(btn_list['my_masters_btn']), callback=my_masters.get_my_masters_keyboard))
+    updater.dispatcher.add_handler(MessageHandler(filters=Filters.regex(btn_list['catalogue_btn']), callback=catalogue.get_category_keyboard))
+
+    updater.dispatcher.add_handler(CallbackQueryHandler(callback=catalogue.catalogue_branch_query_handler))
     updater.dispatcher.add_handler(CallbackQueryHandler(callback=my_masters.choose_master_inline))
+
 
     updater.start_polling()   # начало стучания по апи телеги
     updater.idle()            # бесконечный цикл простукивания
