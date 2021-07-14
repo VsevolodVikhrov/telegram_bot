@@ -1,69 +1,62 @@
-from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
-from telegram.ext import CallbackContext, MessageHandler, Filters, ConversationHandler
+from telegram import Update, ReplyKeyboardRemove
+from telegram.ext import CallbackContext, MessageHandler, Filters, ConversationHandler, CommandHandler
 
-import main
+from main import reply_markup, btn_list, logger
 import mocks
-MASTER_ADD, MASTER_CHECK = range(2)
 
-# TODO: i guess this file will also contain a function handling
-# TODO: adding masters via external link
+# keeping this line instead of MASTER_ADD = 0 so that more menu points can be added
+MASTER_ADD = range(1)
 
-
-
-
-
-
-
+# i guess this file will also contain a function handling
+# TODO: adding masters via external link (deep-linking)
 
 
 def get_add_master(update: Update, context: CallbackContext) -> int:
-    update.message.reply_text(text="Введите ник мастера, чтобы добавить его себе в список:")
+    update.message.reply_text(text="Введите ник мастера, чтобы добавить его себе в список.\n"
+                                   "Для выхода введите /cancel.", reply_markup=ReplyKeyboardRemove())
     return MASTER_ADD
-
-    # TODO: getting user's input in a way that all commands won't be read as a username, but is this even necessary?
-    # updater.dispatcher.add_handler(MessageHandler(filters=Filters.regex("/start"), callback=start_screen))
 
 
 def send_new_master(update: Update, context: CallbackContext) -> int:
-    print('22')
+    # handling the case when user sends a text that matches one of
+    # button messages
+    if update.message.text in btn_list.values():
+        return cancel(update, context)
+
+    # TODO: input validation?
+
     master_name = update.message.text
 
-    # code for sending the username to the server goes here
+    #
+    # TODO: code for sending user's input to API goes here
+    #
 
     if mocks.send_new_master(master_name):
+        logger.info(f"User ID:{update.message.from_user.id} added master '{master_name}'.")
         return done(update, context)
     else:
         update.message.reply_text(text=f"Мастер не найден. Давайте попробуем снова.")
-        return MASTER_CHECK
-
-
-def wrong_username(update: Update, context: CallbackContext) -> int:
-    master_name = update.message.text
-    if mocks.send_new_master(master_name):
-        done(update, context)
-    else:
-        return MASTER_CHECK
+        return MASTER_ADD
 
 
 def done(update: Update, context: CallbackContext) -> int:
-    update.message.reply_text(text=f"Мастер добавлен!")
+    update.message.reply_text(text=f"Мастер добавлен!", reply_markup=reply_markup)
     return ConversationHandler.END
 
 
 def cancel(update: Update, context: CallbackContext) -> int:
-    update.message.reply_text(text=f"Операция отменена.")
+    update.message.reply_text(text=f"Операция отменена.", reply_markup=reply_markup)
     return ConversationHandler.END
 
 
 conv_handler = ConversationHandler(
-        entry_points=[MessageHandler(filters=Filters.regex(main.add_master_btn), callback=get_add_master)],
+        entry_points=[MessageHandler(filters=Filters.regex(btn_list['add_master_btn']), callback=get_add_master)],
         states={
             MASTER_ADD: [
                 MessageHandler(filters=Filters.text & ~Filters.command, callback=send_new_master)
             ],
-            MASTER_CHECK: [
-                MessageHandler(filters=Filters.text & ~Filters.command, callback=wrong_username)
-            ],
         },
-        fallbacks=[MessageHandler(filters=Filters.regex('cancel'), callback=cancel)]
+        fallbacks=[
+            CommandHandler(command='cancel', callback=cancel),
+            ]
 )
