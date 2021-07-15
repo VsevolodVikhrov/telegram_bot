@@ -10,13 +10,14 @@ basicConfig(
 )
 logger = getLogger(__name__)
 
-# in further add buttons here so that exception handling in add_masters.py works
+# later, add buttons here so that exception handling in add_masters.py works
 btn_list = {
     'catalogue_btn': "Каталог",
     'add_master_btn': "Добавить мастера",
     'my_orders_btn': "Мои брони",
     'my_masters_btn': "Мои мастера",
 }
+
 
 reply_markup = ReplyKeyboardMarkup(  # Добавляем клаву
         keyboard=[  # добавляем на клаву кнопки
@@ -29,8 +30,10 @@ reply_markup = ReplyKeyboardMarkup(  # Добавляем клаву
                 KeyboardButton(text=btn_list['my_masters_btn'])
             ]
         ],
-        resize_keyboard=True  # параметр для пересчета размера кнопок
+        one_time_keyboard=True,
+        resize_keyboard=True, # параметр для пересчета размера кнопок
     )
+
 
 
 def start_screen(update: Update, context: CallbackContext) -> None:
@@ -46,10 +49,13 @@ def main() -> None:
                                                   callback=my_masters.get_my_masters_keyboard))
     updater.dispatcher.add_handler(MessageHandler(filters=Filters.regex(btn_list['catalogue_btn']),
                                                   callback=catalogue.get_category_keyboard))
+    updater.dispatcher.add_handler(MessageHandler(filters=Filters.regex(btn_list['my_orders_btn']), 
+                                                  callback=my_orders.get_my_orders_keyboard))
 
     updater.dispatcher.add_handler(CallbackQueryHandler(callback=catalogue.catalogue_branch_query_handler))
-    updater.dispatcher.add_handler(CallbackQueryHandler(callback=my_masters.choose_master_inline))
-
+    updater.dispatcher.add_handler(CallbackQueryHandler(callback=my_masters.masters_branch_query_handler))
+    updater.dispatcher.add_handler(CallbackQueryHandler(callback=my_orders.choose_order_inline))
+    
     updater.start_polling()   # начало стучания по апи телеги
     updater.idle()            # бесконечный цикл простукивания
 
