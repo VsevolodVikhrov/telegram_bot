@@ -25,7 +25,7 @@ def catalogue_branch_query_handler(update: Update, context: CallbackContext):
 
     # TODO: handling different requests in separate functions
 
-    if query.data.split('_')[0] == "CATREQ":
+    if query.data.split('_')[0] == "CAT%CATREQ":
         category = query.data.split('_')[1]
 
     inline_keyboard = get_buttons(callback_type="MASTERSREQ", positions=mocks.get_category_masters(category))
@@ -37,7 +37,7 @@ def get_buttons(callback_type: str, positions: typing.List) -> typing.List:
     """Gets a list of master/catalogue positions and processes them into a keyboard."""
     buttons = []
     for position in positions:
-        buttons.append(InlineKeyboardButton(text=position, callback_data=f"{callback_type}_{position}"))
+        buttons.append(InlineKeyboardButton(text=position, callback_data=f"CAT%{callback_type}_{position}"))
     row_length = 5
     inline_keyboard = [buttons[i:i + row_length] for i in range(0, len(buttons), row_length)]
     return inline_keyboard
