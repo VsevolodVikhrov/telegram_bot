@@ -61,7 +61,8 @@ def get_times(master, skill, date):
 anton = 443993822
 alex = 347083046
 seva = 427279107
-orders = {443993822: ['nails', 'make up', 'brows']}
+orders = {443993822: ['nails', 'make up', 'brows'],
+          347083046: ['nails']}
 order = {'nails': ['Algima', '25$', '20-07-2021', '17.00'],
          'make up': ['Julia', '40$', '21-07-2021', '10-00'],
          'brows': ['Anya', '23.5$', '21-07-2021', '21=00']

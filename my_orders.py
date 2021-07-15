@@ -6,8 +6,8 @@ import mocks
 
 def get_my_orders_keyboard(update: Update, context: CallbackContext):
     """
-    В зависимости от вызова функции с парметра update либо query будет по разному достоваться user.id,
-    а так же используя разные методы для отрисовки клавиутры используя функцию get_my_orders_buttons
+    В зависимости от вызова функции с парметра update либо query будет по разному доставаться user.id,
+    а так же используя разные методы для отрисовки клавиатуры, используя функцию get_my_orders_buttons
     """
     if update.message:
         user = update.message.from_user
@@ -76,7 +76,7 @@ def get_order_info(query, order):
                                                  callback_data=f'{order}__back_to_my_orders')])
     reply_markup = InlineKeyboardMarkup(inline_keyboard)
     query.edit_message_text(text=f'Your master : {order_info[0]}\n'
-                                 f'Your chosen servise: {order}\n'
+                                 f'Your chosen service: {order}\n'
                                  f'Price : {order_info[1]}\n'
                                  f'Date : {order_info[2]}\n'
                                  f'Time: {order_info[3]}',

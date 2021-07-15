@@ -35,7 +35,6 @@ reply_markup = ReplyKeyboardMarkup(  # Добавляем клаву
     )
 
 
-
 def start_screen(update: Update, context: CallbackContext) -> None:
     # отправка на апи телеги сообщения и клавы
     update.message.reply_text(text="Привет, друг!", reply_markup=reply_markup)
@@ -52,10 +51,13 @@ def main() -> None:
     updater.dispatcher.add_handler(MessageHandler(filters=Filters.regex(btn_list['my_orders_btn']), 
                                                   callback=my_orders.get_my_orders_keyboard))
 
-    updater.dispatcher.add_handler(CallbackQueryHandler(callback=catalogue.catalogue_branch_query_handler))
-    updater.dispatcher.add_handler(CallbackQueryHandler(callback=my_masters.masters_branch_query_handler))
-    updater.dispatcher.add_handler(CallbackQueryHandler(callback=my_orders.choose_order_inline))
-    
+    updater.dispatcher.add_handler(
+        CallbackQueryHandler(callback=catalogue.catalogue_branch_query_handler, pattern="^CAT%"))
+    updater.dispatcher.add_handler(
+        CallbackQueryHandler(callback=my_orders.choose_order_inline))
+    updater.dispatcher.add_handler(
+        CallbackQueryHandler(callback=my_masters.masters_branch_query_handler))
+
     updater.start_polling()   # начало стучания по апи телеги
     updater.idle()            # бесконечный цикл простукивания
 
