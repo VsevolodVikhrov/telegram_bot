@@ -53,7 +53,7 @@ def main() -> None:
 
     updater.dispatcher.add_handler(CallbackQueryHandler(callback=my_masters.masters_branch_query_handler, pattern="m\%"))
     updater.dispatcher.add_handler(CallbackQueryHandler(callback=catalogue.catalogue_branch_query_handler))
-    updater.dispatcher.add_handler(CallbackQueryHandler(callback=my_orders.choose_order_inline))
+    updater.dispatcher.add_handler(CallbackQueryHandler(callback=my_orders.choose_order_inline, pattern="mrdr\%"))
     
     updater.start_polling()   # начало стучания по апи телеги
     updater.idle()            # бесконечный цикл простукивания

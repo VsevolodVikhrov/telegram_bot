@@ -32,7 +32,7 @@ def get_my_orders_buttons(user_id: int):
     inline_keyboard = []
     if bool(orders):
         for order in orders:
-            inline_keyboard.append([InlineKeyboardButton(text=order, callback_data=f'{order}__chosen_order')])
+            inline_keyboard.append([InlineKeyboardButton(text=order, callback_data=f'mrdr%chosen_order__{order}')])
         keyboard = InlineKeyboardMarkup(inline_keyboard)
     else:
         keyboard = 'У вас еще нет заказов'
@@ -48,18 +48,19 @@ def choose_order_inline(update: Update, context: CallbackContext):
     query = update.callback_query
     query.answer()
     pushed_btn = query.data
-    order = re.search(r'(.+)__', pushed_btn).group(1)
+    '(.+)__'
+    order = re.search(r'__(.+)', pushed_btn).group(1)
     if 'chosen_order' in pushed_btn:
         get_order_info(query, order)
     elif 'approve_delete' in pushed_btn:
         approve_delete(update, context)
         get_my_orders_keyboard(update, context)
     else:
-        key = pushed_btn[len(order):]
+        key = pushed_btn[:-len(order)]
         function = {
-            '__back_to_my_orders': get_my_orders_keyboard,
-            '__delete_order': ask_delete_order,
-            '__decline_delete': get_my_orders_keyboard,
+            'mrdr%back_to_my_orders__': get_my_orders_keyboard,
+            'mrdr%delete_order__': ask_delete_order,
+            'mrdr%decline_delete__': get_my_orders_keyboard,
         }
         function[key](update, context)
 
@@ -71,9 +72,9 @@ def get_order_info(query, order):
     """
     order_info = mocks.get_order(order)
     inline_keyboard = []
-    inline_keyboard.append([InlineKeyboardButton(text='Отменить заказ', callback_data=f'{order}__delete_order')])
+    inline_keyboard.append([InlineKeyboardButton(text='Отменить заказ', callback_data=f'mrdr%delete_order__{order}')])
     inline_keyboard.append([InlineKeyboardButton(text='Вернуться к списку заказов',
-                                                 callback_data=f'{order}__back_to_my_orders')])
+                                                 callback_data=f'mrdr%back_to_my_orders__{order}')])
     reply_markup = InlineKeyboardMarkup(inline_keyboard)
     query.edit_message_text(text=f'Your master : {order_info[0]}\n'
                                  f'Your chosen servise: {order}\n'
@@ -90,10 +91,10 @@ def ask_delete_order(update, contex):
     """
     query = update.callback_query
     query.answer()
-    order = re.search(r'(.+)__', query.data).group(1)
+    order = re.search(r'__(.+)', query.data).group(1)
     keyboard = [
-            [InlineKeyboardButton(text="Да", callback_data=f"{order}__approve_delete"),
-             InlineKeyboardButton(text="Нет", callback_data=f"{order}__decline_delete")],
+            [InlineKeyboardButton(text="Да", callback_data=f"mrdr%approve_delete__{order}"),
+             InlineKeyboardButton(text="Нет", callback_data=f"mrdr%decline_delete__{order}")],
                 ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     query.edit_message_text(text=f"Вы действительно хотите удалить {order}?", reply_markup=reply_markup)
