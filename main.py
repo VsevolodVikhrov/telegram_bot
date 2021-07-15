@@ -41,8 +41,13 @@ def main():
 
     updater = Updater(token=config.BOT_TOKEN, use_context=True)   # подключение к боту
     updater.dispatcher.add_handler(MessageHandler(filters=Filters.regex("/start"), callback=start_screen))  # добавление обработчика сообщений в очередь, в параметрах условие для выполнения и действие, которое выполнится
+    updater.dispatcher.add_handler(MessageHandler(filters=Filters.regex(my_masters_btn), callback=my_masters.get_my_masters_keyboard))
+    updater.dispatcher.add_handler(MessageHandler(filters=Filters.regex(my_orders_btn), callback=my_orders.get_my_orders_keyboard))
+    updater.dispatcher.add_handler(CallbackQueryHandler(callback=my_masters.masters_branch_query_handler))
     updater.dispatcher.add_handler(CallbackQueryHandler(callback=my_orders.choose_order_inline))
     updater.dispatcher.add_handler(MessageHandler(filters=Filters.regex(my_orders_btn), callback=my_orders.get_my_orders_keyboard))
+
+    
     updater.start_polling()   # начало стучания по апи телеги
     updater.idle()            # бесконечный цикл простукивания
 
