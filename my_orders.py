@@ -1,7 +1,7 @@
 import re
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import CallbackContext
-import mocks
+from decorators import debug_decorator
 
 
 def get_my_orders_keyboard(update: Update, context: CallbackContext):
@@ -22,13 +22,13 @@ def get_my_orders_keyboard(update: Update, context: CallbackContext):
         user = query.from_user
         query.edit_message_text(text="Мои брони:", reply_markup=get_my_orders_buttons(user.id))
 
-
-def get_my_orders_buttons(user_id: int):
+@debug_decorator
+def get_my_orders_buttons(user_id: int, source):
     """
     Функция проверяет список заказов, если заказы есть строит и возвращает клавиатуру/список с заказами,
     если список пустой возврщается сообщение: "У вас еще нет заказов".
     """
-    orders = mocks.get_orders(user_id)
+    orders = source.get_orders(user_id)
     inline_keyboard = []
     if bool(orders):
         for order in orders:
@@ -64,13 +64,13 @@ def choose_order_inline(update: Update, context: CallbackContext):
         }
         function[key](update, context)
 
-
-def get_order_info(query, order):
+@debug_decorator
+def get_order_info(query, order, source):
     """
     Функция для вывода информации о заказе и отрисовке клавиатуры с 2 вариантами нажатия "Отменить заказ"
     или "Вернуться к списку заказов"
     """
-    order_info = mocks.get_order(order)
+    order_info = source.get_order(order)
     inline_keyboard = []
     inline_keyboard.append([InlineKeyboardButton(text='Отменить заказ', callback_data=f'mrdr%delete_order__{order}')])
     inline_keyboard.append([InlineKeyboardButton(text='Вернуться к списку заказов',
