@@ -29,16 +29,19 @@ def send_new_master(update: Update, context: CallbackContext) -> int:
 
     master_name = update.message.text
 
-    #
-    # TODO: code for sending user's input to API goes here
-    #
-
-    if mocks.send_new_master(master_name):
+    if submit_new_master(master_name):
         logger.info(f"User ID:{update.message.from_user.id} added master '{master_name}'.")
         return done(update, context)
     else:
         update.message.reply_text(text=f"Мастер не найден. Давайте попробуем снова.")
         return MASTER_ADD
+
+
+def submit_new_master(master_name: str) -> bool:
+    #
+    # TODO: code for sending user's input to API goes here
+    #
+    return mocks.send_new_master(master_name)
 
 
 def done(update: Update, context: CallbackContext) -> int:

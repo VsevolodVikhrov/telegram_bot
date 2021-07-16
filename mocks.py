@@ -25,7 +25,7 @@ category_masters = {
 }
 
 
-def get_category_masters(category):
+def get_category_masters(category: str):
     return category_masters[category]
 
 
