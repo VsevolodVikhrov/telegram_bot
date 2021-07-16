@@ -1,7 +1,7 @@
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import CallbackContext, CallbackQueryHandler
-import mocks
 import re
+from decorators import get_data_source
 
 
 # блок обработки и отображения инлайн клавы со списком мастеров
@@ -18,9 +18,10 @@ def get_my_masters_keyboard(update: Update, context: CallbackContext):
         query.edit_message_text(text="Мои мастера:", reply_markup=reply_markup)
 
 
-def get_my_masters_btns():
+@get_data_source
+def get_my_masters_btns(source):
     """Возвращает кнопки с мастерами пользователя в клавиатуру"""
-    my_masters = mocks.get_masters()
+    my_masters = source.get_masters()
     inline_keyboard = []
     for master in my_masters:
         inline_keyboard.append([InlineKeyboardButton(text=master, callback_data=f"m%{master}_chosen_master")])
@@ -55,9 +56,10 @@ def get_master_skills_keyboard(query, master):
     query.edit_message_text(text="Услуги мастера:", reply_markup=reply_markup)
 
 
-def get_master_skills_btns(master):
+@get_data_source
+def get_master_skills_btns(master, source):
     """Возвращает кнопки со скиллами мастера в клавиатуру"""
-    skills = mocks.get_skills(master)
+    skills = source.get_skills(master)
     inline_keyboard = []
     for skill in skills:
         inline_keyboard.append([InlineKeyboardButton(text=skill, callback_data=f"m%{master}_skill_is_{skill}")])
@@ -95,9 +97,10 @@ def get_calendar_keyboard(query, master_and_skill):
     query.edit_message_text(text="Доступные даты:", reply_markup=reply_markup)
 
 
-def get_calendar_btns(master, skill):
+@get_data_source
+def get_calendar_btns(master, skill, source):
     """Возвращает кнопки с календарем мастера в клавиатуру"""
-    dates = mocks.get_dates(master, skill)
+    dates = source.get_dates(master, skill)
     date_buttons = []
     for date in dates:
         date_buttons.append(InlineKeyboardButton(text=date, callback_data=f"m%{master}_mstr_{skill}_skl_{date}_dt__"))
@@ -118,9 +121,10 @@ def get_time_keyboard(query, master_and_skill_and_date):
     query.edit_message_text(text="Доступное время:", reply_markup=reply_markup)
 
 
-def get_time_btns(master, skill, date):
+@get_data_source
+def get_time_btns(master, skill, date, source):
     """Возвращает кнопки со временем в клавиатуру"""
-    times = mocks.get_times(master, skill, date)
+    times = source.get_times(master, skill, date)
     time_buttons = []
     for time in times:
         time_buttons.append(InlineKeyboardButton(text=time, callback_data=f"m%{master}_mstr_{skill}_skl_{date}_dt_{time}"))
