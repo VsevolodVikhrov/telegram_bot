@@ -1,6 +1,7 @@
 from telegram import Update, ReplyKeyboardRemove
 from telegram.ext import CallbackContext, MessageHandler, Filters, ConversationHandler, CommandHandler
 
+from decorators import debug_decorator as debug_decorator
 from main import reply_markup, btn_list, logger
 import mocks
 
@@ -29,7 +30,7 @@ def send_new_master(update: Update, context: CallbackContext) -> int:
 
     master_name = update.message.text
 
-    if submit_new_master(master_name):
+    if submit_new_master(mock=mocks.send_new_master, master=master_name):
         logger.info(f"User ID:{update.message.from_user.id} added master '{master_name}'.")
         return done(update, context)
     else:
@@ -37,11 +38,12 @@ def send_new_master(update: Update, context: CallbackContext) -> int:
         return MASTER_ADD
 
 
-def submit_new_master(master_name: str) -> bool:
+@debug_decorator
+def submit_new_master(mock=mocks.send_new_master, master='undefined') -> bool:
     #
     # TODO: code for sending user's input to API goes here
     #
-    return mocks.send_new_master(master_name)
+    return False
 
 
 def done(update: Update, context: CallbackContext) -> int:

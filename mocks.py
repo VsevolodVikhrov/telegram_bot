@@ -1,5 +1,5 @@
 # `add_master` mocks
-def send_new_master(master_name: str):
+def send_new_master(master: str):
     return True
 
 
