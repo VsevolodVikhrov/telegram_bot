@@ -81,5 +81,3 @@ def get_orders(key: int) -> list:
 
 def get_order(key: str) -> list:
     return order[key]
-
-print('хуй')
