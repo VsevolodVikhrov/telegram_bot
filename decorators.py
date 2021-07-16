@@ -1,13 +1,13 @@
 import functools
-from config import DEBUG as DEBUG
+import config
 import mocks
 
 
-def debug_decorator(func):
-    @functools.wraps(func)
+def get_data_source(function):
+    @functools.wraps(function)
     def wrapper(*args, **kwargs):
-        source = None
-        if DEBUG:
+        source = None  # подразумевается присваивание файла с функциями запросов на бэкэнд
+        if config.DEBUG:
             source = mocks
-            return func(*args, **kwargs, source=source)
-    return wrapper
+        return function(*args, **kwargs, source=source)
+
