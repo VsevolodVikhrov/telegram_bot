@@ -1,7 +1,7 @@
 import re
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import CallbackContext
-from decorators import debug_decorator
+from decorators import get_data_source
 
 
 def get_my_orders_keyboard(update: Update, context: CallbackContext):
@@ -22,7 +22,7 @@ def get_my_orders_keyboard(update: Update, context: CallbackContext):
         user = query.from_user
         query.edit_message_text(text="Мои брони:", reply_markup=get_my_orders_buttons(user.id))
 
-@debug_decorator
+@get_data_source
 def get_my_orders_buttons(user_id: int, source):
     """
     Функция проверяет список заказов, если заказы есть строит и возвращает клавиатуру/список с заказами,
@@ -64,7 +64,7 @@ def choose_order_inline(update: Update, context: CallbackContext):
         }
         function[key](update, context)
 
-@debug_decorator
+@get_data_source
 def get_order_info(query, order, source):
     """
     Функция для вывода информации о заказе и отрисовке клавиатуры с 2 вариантами нажатия "Отменить заказ"
