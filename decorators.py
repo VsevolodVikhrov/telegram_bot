@@ -23,3 +23,4 @@ def get_data_source(function):
         if config.DEBUG:
             source = mocks
         return function(*args, **kwargs, source=source)
+    return wrapper
