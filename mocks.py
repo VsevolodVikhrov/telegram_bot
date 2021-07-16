@@ -1,5 +1,5 @@
 # `add_master` mocks
-def send_new_master(master_name: str):
+def send_new_master(master: str):
     return True
 
 
@@ -25,7 +25,7 @@ category_masters = {
 }
 
 
-def get_category_masters(category):
+def get_category_masters(category: str):
     return category_masters[category]
 
 
