@@ -3,6 +3,7 @@ import config
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup
 from telegram.ext import Updater, CallbackContext, Filters, MessageHandler, CallbackQueryHandler, ConversationHandler
 import my_masters, my_orders, add_master, catalogue
+import data_processing
 
 
 basicConfig(
@@ -37,6 +38,8 @@ reply_markup = ReplyKeyboardMarkup(  # Добавляем клаву
 
 def start_screen(update: Update, context: CallbackContext) -> None:
     # отправка на апи телеги сообщения и клавы
+    user = update.message.from_user
+    data_processing.set_user_data(user)
     update.message.reply_text(text="Привет, друг!", reply_markup=reply_markup)
 
 
