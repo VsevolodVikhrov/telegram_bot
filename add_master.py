@@ -1,3 +1,4 @@
+import requests
 from telegram import Update, ReplyKeyboardRemove
 from telegram.ext import CallbackContext, MessageHandler, Filters, ConversationHandler, CommandHandler
 
@@ -43,7 +44,22 @@ def submit_new_master(mock=mocks.send_new_master, master='undefined') -> bool:
     #
     # TODO: code for sending user's input to API goes here
     #
-    return False
+    # post-request for getting master's id
+    # if no master found, throw 404
+    # else append this id to user's list
+
+    # TODO: PLEASE REFACTOR THIS (magic numbers (urls), separate get/set logic)
+    check_id = requests.get('http://127.0.0.1:8000/client/clients/add_master/get_id/',
+                        json={"nickname": master}).json()
+    if not check_id:
+        return False
+    else:
+        user_info = requests.get('http://127.0.0.1:8000/client/clients/add_master/123123123').json()
+        if check_id not in user_info['master']:
+            user_info['master'].append(check_id)
+        requests.put('http://127.0.0.1:8000/client/clients/add_master/123123123',
+                     json=user_info)
+        return True
 
 
 def done(update: Update, context: CallbackContext) -> int:
