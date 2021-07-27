@@ -1,9 +1,14 @@
 from telegram import Update, ReplyKeyboardRemove, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext, MessageHandler, Filters, ConversationHandler, CommandHandler
+import requests
 import typing
 
 from decorators import debug_decorator as debug_decorator
 import mocks
+
+URLS = {
+    "catalogue": "http://127.0.0.1:8000/client/categories/",
+}
 
 
 def get_category_keyboard(update: Update, context: CallbackContext):
@@ -22,11 +27,8 @@ def get_category_keyboard(update: Update, context: CallbackContext):
 
 @debug_decorator
 def get_catalogue_categories(mock=mocks.get_catalogue_categories):
-
-    # TODO: SQL-query goes here
-
-    categories = ['NOT', 'IMPLEMENTED']
-    return categories
+    """Auxiliary function for getting a list of available services categories."""
+    return requests.get(URLS["catalogue"]).json()
 
 
 def catalogue_branch_query_handler(update: Update, context: CallbackContext):
@@ -41,24 +43,24 @@ def catalogue_branch_query_handler(update: Update, context: CallbackContext):
         category = query.data.split('_')[1]
 
     inline_keyboard = get_buttons(row_length=5, callback_type="MASTERSREQ",
-                                  positions=get_category_masters(mocks.get_category_masters, category))
+                                  positions=get_category_masters(mocks.get_category_masters, str(category)))
     reply_markup = InlineKeyboardMarkup(inline_keyboard)
     query.edit_message_text(text="Мастера в этой категории:", reply_markup=reply_markup)
 
 
 @debug_decorator
-def get_category_masters(mock=mocks.get_category_masters, category=None):
-
-    # TODO: SQL-query goes here
-
-    masters = ['NOT', 'IMPLEMENTED', 'YET']
-    return masters
+def get_category_masters(mock=mocks.get_category_masters, category_id=None):
+    """Auxiliary function for retrieving a list of masters who provide services under the specified category."""
+    return requests.get(URLS["catalogue"] + category_id).json()
 
 
-def get_buttons(row_length: int, callback_type: str, positions: typing.List) -> typing.List:
+def get_buttons(row_length: int, callback_type: str, positions: typing.Dict) -> typing.List:
     """Gets a list of master/catalogue positions and processes them into a keyboard."""
     buttons = []
     for position in positions:
-        buttons.append(InlineKeyboardButton(text=position, callback_data=f"CAT%{callback_type}_{position}"))
+        # because category names and master nicknames are stored under keys with different names and same indexes,
+        # in field `text` we turn `position` dict into a list of keys, then get a value of the second (`name`) key
+        buttons.append(InlineKeyboardButton(text=position[list(position)[1]],
+                                            callback_data=f"CAT%{callback_type}_{position['id']}"))
     inline_keyboard = [buttons[i:i + row_length] for i in range(0, len(buttons), row_length)]
     return inline_keyboard
