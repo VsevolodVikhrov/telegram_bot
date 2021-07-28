@@ -2,7 +2,7 @@ import requests
 
 
 def set_user_data(user):
-    url = 'http://127.0.0.1:8000/client/clients/'
+    url = 'http://127.0.0.1:8000/client/clients/register/'
     data = user_data_serializer(user)
     return requests.post(url, json=data)
 

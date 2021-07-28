@@ -55,7 +55,7 @@ def submit_new_master(user_id, mock=mocks.send_new_master, master='undefined') -
         user_info = get_user_info(user_id)
         if master_id not in user_info['master']:
             user_info['master'].append(master_id)
-        requests.put(URLS['add_master'] + user_id, json=user_info)
+        requests.patch(URLS['add_master'] + user_id, json=user_info)
         return True
 
 
