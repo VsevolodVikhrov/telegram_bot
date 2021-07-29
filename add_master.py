@@ -9,8 +9,8 @@ import mocks
 
 # list of urls
 URLS = {
-    "get_master_id": 'http://127.0.0.1:8000/client/clients/add_master/get_id/',
-    "add_master": 'http://127.0.0.1:8000/client/clients/add_master/',
+    "get_master_id": 'http://127.0.0.1:8000/client/add_master/get_id/',
+    "add_master": 'http://127.0.0.1:8000/client/add_master/',
 }
 
 # keep this line instead of MASTER_ADD = 0 so that more menu points can be added later

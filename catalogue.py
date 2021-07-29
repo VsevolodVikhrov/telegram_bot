@@ -1,5 +1,6 @@
 from telegram import Update, ReplyKeyboardRemove, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext, MessageHandler, Filters, ConversationHandler, CommandHandler
+from json import JSONDecodeError
 import requests
 import typing
 
@@ -49,9 +50,16 @@ def catalogue_branch_query_handler(update: Update, context: CallbackContext):
 
 
 @debug_decorator
-def get_category_masters(mock=mocks.get_category_masters, category_id=None):
+def get_category_masters(category_id, mock=mocks.get_category_masters):
     """Auxiliary function for retrieving a list of masters who provide services under the specified category."""
-    return requests.get(URLS["catalogue"] + category_id).json()
+    try:
+        masters = requests.get(URLS["catalogue"] + category_id).json()
+    except JSONDecodeError:
+        return [{
+            'id': '0',
+            'comment': 'В этой категории пока что нет мастеров.'
+        }]
+    return masters
 
 
 def get_buttons(row_length: int, callback_type: str, positions: typing.Dict) -> typing.List:
