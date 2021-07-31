@@ -1,5 +1,6 @@
 import requests
 from datetime import datetime
+from itertools import groupby
 
 
 def set_user_data(user):
@@ -32,10 +33,22 @@ def get_masters(user):
     return masters_list
 
 
+def remove_master(user, master_id):
+    client_telegram_id = user.id
+    url = f'http://127.0.0.1:8000/client/add_master/{client_telegram_id}'
+    masters_list = requests.get(url).json()['master']
+    masters_list.remove(int(master_id))
+    data = {
+        "client_telegram_id": client_telegram_id,
+        "master": masters_list
+    }
+    requests.patch(url, json=data)
+
+
 ONE_HOUR_SECONDS_COUNT = 3600
 
 
-def get_dates(master_id, skill_id):
+def get_datetime_list(master_id, skill_id):
     schedule_url = f'http://127.0.0.1:8000/schedule/by_master/{master_id}'
     service_url = f'http://127.0.0.1:8000/master/detail/?service={skill_id}'
     schedule_data = requests.get(schedule_url).json()
@@ -75,3 +88,19 @@ def get_dates(master_id, skill_id):
                 if (len(temp_list)+1) == duration:
                     timeslots.append(datetime_objects[i])
     return timeslots
+
+
+def get_dates(master_id, skill_id):
+    timeslots = get_datetime_list(master_id, skill_id)
+    dates = [timeslot.date() for timeslot in timeslots]
+    dates = [el for el, _ in groupby(dates)]
+    return dates
+
+
+def get_times(master_id, skill_id, date):
+    timeslots = get_datetime_list(master_id, skill_id)
+    assigned_timeslots = [timeslot for timeslot in timeslots if str(timeslot.date()) == date]
+    return assigned_timeslots
+
+
+
