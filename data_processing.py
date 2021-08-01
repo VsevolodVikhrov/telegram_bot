@@ -1,3 +1,5 @@
+import re
+
 import requests
 from datetime import datetime
 from itertools import groupby
@@ -102,5 +104,39 @@ def get_times(master_id, skill_id, date):
     assigned_timeslots = [timeslot for timeslot in timeslots if str(timeslot.date()) == date]
     return assigned_timeslots
 
+
+def make_order(user, callback_data):
+    url = 'http://127.0.0.1:8000/order/create/'
+    user_id = user.id
+    master_id = re.search(r"%(.+?)_mstr", callback_data).group(1)
+    skill_id = re.search(r"mstr_(.+?)_skl", callback_data).group(1)
+    datetime_info = re.search(r"skl_(.+)_dtmc", callback_data).group(1)
+    start_datetime_object = datetime.strptime(datetime_info, '%Y-%m-%d %H:%M:%S')
+    start_datetime_string = datetime.strftime(start_datetime_object, '%Y-%m-%dT%H:%M:%SZ')
+    data = {
+        "client_telegram_id": user_id,
+        "master": master_id,
+        "service": skill_id,
+        "start_datetime_slot": start_datetime_string
+    }
+    requests.post(url, json=data)
+
+
+def get_service_info(skill_id):
+    url = f'http://127.0.0.1:8000/master/detail/?service={skill_id}'
+    data = requests.get(url).json()[0]
+    title = data['title']
+    price = data['price']
+    description = data['description']
+    duration = data['duration']
+    if duration == 1:
+        plural = 'часа'
+    else:
+        plural = 'часов'
+    text = f'Наименование: {title}\n' \
+           f'Описание: {description}\n' \
+           f'Стоимость: {price}\n' \
+           f'Продолжительность: до {duration} {plural}'
+    return text
 
 
