@@ -1,7 +1,6 @@
 import functools
 from config import DEBUG
-import mocks
-import data_processing
+import mocks, data_processing
 
 
 # decorator for add master and catalogue features
@@ -18,6 +17,7 @@ def debug_decorator(func):
 def get_data_source(function):
     @functools.wraps(function)
     def wrapper(*args, **kwargs):
+        source = data_processing
         if DEBUG:
             source = mocks
         else:
