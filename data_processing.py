@@ -1,14 +1,48 @@
 import re
-
 import requests
 from datetime import datetime
 from itertools import groupby
 
 
-def set_user_data(user):
+def start_handler(user, update):
     url = 'http://127.0.0.1:8000/client/clients/'
     data = user_data_serializer(user)
-    return requests.post(url, json=data)
+    requests.post(url, json=data)
+    deep_linking_query = update.effective_message.text
+    param = re.search('/start (.+)', deep_linking_query).group(1)
+    user_id = update.effective_user.id
+    if param[0:9] == 'addmaster':
+        master_nickname = param[10:]
+        add_master_via_link(user_id, master_nickname)
+    if param[0:4] == 'code':
+        code = param[5:]
+        username = update.effective_user.username
+        try_to_assign_code(user_id, username, code)
+
+
+def add_master_via_link(user_id, master_nickname):
+    get_id_by_nickname = 'http://127.0.0.1:8000/client/add_master/get_id/'
+    get_masters_url = f'http://127.0.0.1:8000/client/add_master/{user_id}'
+    master_dict = {"nickname": master_nickname}
+    master_id = requests.get(get_id_by_nickname, json=master_dict).json()
+    masters_list = requests.get(get_masters_url).json()['master']
+    if master_id not in masters_list:
+        masters_list.append(master_id)
+    data = {
+        "client_telegram_id": user_id,
+        "master": masters_list
+    }
+    requests.patch(get_masters_url, json=data)
+
+
+def try_to_assign_code(user_id, username, code):
+    url = 'http://127.0.0.1:8000/master/addmastertelegram/'
+    data = {
+        "master_telegram_id": user_id,
+        "master_telegram_nickname": username,
+        "verify_code": code
+    }
+    requests.patch(url, json=data)
 
 
 def user_data_serializer(user):
