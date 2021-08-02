@@ -42,6 +42,7 @@ def send_new_master(update: Update, context: CallbackContext) -> int:
         logger.info(f"User ID:{update.message.from_user.id} added master '{master_name}'.")
         return done(update, context)
     else:
+        # TODO: `return` button
         update.message.reply_text(text=f"Мастер не найден. Давайте попробуем снова.")
         return MASTER_ADD
 
