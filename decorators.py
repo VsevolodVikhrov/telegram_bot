@@ -20,5 +20,7 @@ def get_data_source(function):
         source = data_processing
         if DEBUG:
             source = mocks
+        else:
+            source = data_processing  # подразумевается присваивание файла с функциями запросов на бэкэнд
         return function(*args, **kwargs, source=source)
     return wrapper
