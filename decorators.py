@@ -1,6 +1,7 @@
 import functools
 from config import DEBUG
 import mocks
+import data_processing
 
 
 # decorator for add master and catalogue features
@@ -17,8 +18,9 @@ def debug_decorator(func):
 def get_data_source(function):
     @functools.wraps(function)
     def wrapper(*args, **kwargs):
-        source = None  # подразумевается присваивание файла с функциями запросов на бэкэнд
         if DEBUG:
             source = mocks
+        else:
+            source = data_processing  # подразумевается присваивание файла с функциями запросов на бэкэнд
         return function(*args, **kwargs, source=source)
     return wrapper
