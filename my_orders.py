@@ -37,12 +37,14 @@ def get_my_orders_buttons(user_id: int, source):
     если список пустой возврщается сообщение: "У вас еще нет заказов".
     """
     orders = source.get_orders(user_id)
-    inline_keyboard = []
+    order_buttons = []
     if bool(orders):
         for order in orders:
             order_title = order['service']['title']
             order_id = order['id']
-            inline_keyboard.append([InlineKeyboardButton(text=order_title, callback_data=f'mrdr%chosen_order__{order_id}')])
+            order_buttons.append(InlineKeyboardButton(text=order_title, callback_data=f'mrdr%chosen_order__{order_id}'))
+        row_length = 2
+        inline_keyboard = [order_buttons[i:i + row_length] for i in range(0, len(order_buttons), row_length)]
         keyboard = InlineKeyboardMarkup(inline_keyboard)
     else:
         keyboard = 'У вас еще нет заказов'
@@ -73,6 +75,7 @@ def choose_order_inline(update: Update, context: CallbackContext):
             'mrdr%decline_delete__': get_my_orders_keyboard,
         }
         function[key](update, context)
+
 
 @get_data_source
 def get_order_info(query, order_id, source):
