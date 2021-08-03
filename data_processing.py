@@ -5,19 +5,24 @@ from itertools import groupby
 
 
 def start_handler(user, update):
+    add_user_to_db(user)
+    deep_linking_query = update.effective_message.text
+    if deep_linking_query != '/start':
+        param = re.search('/start (.+)', deep_linking_query).group(1)
+        user_id = user.id
+        if param[0:9] == 'addmaster':
+            master_nickname = param[10:]
+            add_master_via_link(user_id, master_nickname)
+        if param[0:4] == 'code':
+            code = param[5:]
+            username = update.effective_user.username
+            try_to_assign_code(user_id, username, code)
+
+
+def add_user_to_db(user):
     url = 'http://127.0.0.1:8000/client/clients/'
     data = user_data_serializer(user)
     requests.post(url, json=data)
-    deep_linking_query = update.effective_message.text
-    param = re.search('/start (.+)', deep_linking_query).group(1)
-    user_id = update.effective_user.id
-    if param[0:9] == 'addmaster':
-        master_nickname = param[10:]
-        add_master_via_link(user_id, master_nickname)
-    if param[0:4] == 'code':
-        code = param[5:]
-        username = update.effective_user.username
-        try_to_assign_code(user_id, username, code)
 
 
 def add_master_via_link(user_id, master_nickname):

@@ -38,7 +38,7 @@ reply_markup = ReplyKeyboardMarkup(  # Добавляем клаву
 
 def start_screen(update: Update, context: CallbackContext) -> None:
     # отправка на апи телеги сообщения и клавы
-    user = update.message.from_user
+    user = update.effective_user
     data_processing.start_handler(user, update)
     update.message.reply_text(text="Привет, друг!", reply_markup=reply_markup)
 

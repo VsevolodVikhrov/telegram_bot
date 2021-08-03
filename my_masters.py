@@ -118,7 +118,10 @@ def get_calendar_keyboard(query, master_and_skill):
     skill_id = re.search(r"_skill_is_(.+)", master_and_skill).group(1)
     inline_keyboard = get_calendar_btns(master_id, skill_id)
     reply_markup = InlineKeyboardMarkup(inline_keyboard)
-    query.edit_message_text(text="Доступные даты:", reply_markup=reply_markup)
+    if len(inline_keyboard) > 1:
+        query.edit_message_text(text="Доступные даты:", reply_markup=reply_markup)
+    else:
+        query.edit_message_text(text="Для данной услуги нет свободных дат.", reply_markup=reply_markup)
 
 
 @get_data_source
