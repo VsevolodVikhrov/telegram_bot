@@ -57,7 +57,6 @@ def get_masters_list(query, category: str) -> None:
     """Gets a list of masters providing services in the selected category."""
     try:
         inline_keyboard = get_master_buttons(row_length=5, callback_type="MASTERSREQ", category=category,
-                                             # TODO: str(category)?
                                              positions=get_category_masters(mocks.get_category_masters, category))
     except JSONDecodeError:
         inline_keyboard = [[InlineKeyboardButton(text="Назад", callback_data="CAT%CATBACK")]]

@@ -1,7 +1,8 @@
 import requests
 import typing
-from telegram import Update, ReplyKeyboardRemove
-from telegram.ext import CallbackContext, MessageHandler, Filters, ConversationHandler, CommandHandler
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import CallbackContext, CallbackQueryHandler, MessageHandler, Filters,\
+    ConversationHandler, CommandHandler
 
 from decorators import debug_decorator as debug_decorator
 from main import reply_markup, btn_list, logger
@@ -16,14 +17,14 @@ URLS = {
 # keep this line instead of MASTER_ADD = 0 so that more menu points can be added later
 MASTER_ADD = range(1)
 
-# i guess this file will also contain a function handling
-# TODO: adding masters via external link (deep-linking)
-
 
 def get_new_master(update: Update, context: CallbackContext) -> int:
     """Starts the conversation where user adds a master to his list of masters."""
+    inline_keyboard = [[InlineKeyboardButton(text="Назад", callback_data="ADDMASTER_CANCEL")]]
+    cancel_reply_markup = InlineKeyboardMarkup(inline_keyboard)
     update.message.reply_text(text="Введите ник мастера, чтобы добавить его себе в список.\n"
-                                   "Для выхода введите /cancel.", reply_markup=ReplyKeyboardRemove())
+                                   "Для выхода введите /cancel или нажмите кнопку ниже.",
+                              reply_markup=cancel_reply_markup)
     return MASTER_ADD
 
 
@@ -34,7 +35,7 @@ def send_new_master(update: Update, context: CallbackContext) -> int:
     if update.message.text in btn_list.values():
         return cancel(update, context)
 
-    # TODO: input validation?
+    # TODO: input validation for freeing API endpoint load?
 
     master_name = update.message.text
 
@@ -42,13 +43,16 @@ def send_new_master(update: Update, context: CallbackContext) -> int:
         logger.info(f"User ID:{update.message.from_user.id} added master '{master_name}'.")
         return done(update, context)
     else:
-        # TODO: `return` button
-        update.message.reply_text(text=f"Мастер не найден. Давайте попробуем снова.")
+        inline_keyboard = [[InlineKeyboardButton(text="Назад", callback_data="ADDMASTER_CANCEL")]]
+        cancel_reply_markup = InlineKeyboardMarkup(inline_keyboard)
+        update.message.reply_text(text=f"Мастер не найден. Введите никнейм мастера снова.",
+                                  reply_markup=cancel_reply_markup)
         return MASTER_ADD
 
 
 @debug_decorator
 def submit_new_master(user_id, mock=mocks.send_new_master, master='undefined') -> bool:
+    """Handles adding new master to the list of user's masters."""
     master_id = get_master_id(master)
     if not master_id:
         return False
@@ -78,7 +82,10 @@ def done(update: Update, context: CallbackContext) -> int:
 
 def cancel(update: Update, context: CallbackContext) -> int:
     """Exits the conversation."""
-    update.message.reply_text(text=f"Операция отменена.", reply_markup=reply_markup)
+    try:
+        update.message.reply_text(text="Операция отменена.", reply_markup=reply_markup)
+    except AttributeError:
+        update.callback_query.edit_message_text(text="Операция отменена.")
     return ConversationHandler.END
 
 
@@ -92,5 +99,6 @@ conv_handler = ConversationHandler(
         },
         fallbacks=[
             CommandHandler(command='cancel', callback=cancel),
+            CallbackQueryHandler(pattern='ADDMASTER_CANCEL', callback=cancel),
             ]
 )
